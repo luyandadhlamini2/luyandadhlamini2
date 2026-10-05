@@ -1,0 +1,8 @@
+# Bank statements and exports contain personal financial data: never commit them
+*.pdf
+*.csv
+money_sorter_settings.json
+preferences.json
+__pycache__/
+.pytest_cache/
+.venv/
