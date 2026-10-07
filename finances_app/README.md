@@ -30,6 +30,17 @@ streamlit run app.py
 Your browser opens at http://localhost:8501. Upload one or more statement PDFs
 in the sidebar. Password-protected PDFs are supported.
 
+### Or try it online (Streamlit Community Cloud, free)
+
+1. Go to [share.streamlit.io](https://share.streamlit.io) and sign in with GitHub.
+2. Choose **Create app**, then **Deploy a public app from GitHub**.
+3. Repository `luyandadhlamini2/luyandadhlamini2`, branch `finances-app-v1`
+   (or `main` once merged), main file path `finances_app/app.py`.
+4. Choose **Deploy**. The first start takes a few minutes while packages install.
+
+When the app runs online, statements you upload are processed in memory on
+Streamlit's servers rather than on your own computer.
+
 ## Using it
 
 - **Overview**: money in and out, bank fees, spending on needs and wants, net
@@ -85,10 +96,13 @@ Choices worth knowing about:
 
 - Statements are read in memory and never written to disk.
 - What you teach the app (rules, edits, group choices) is saved to
-  `~/.finances_app/preferences.json` so it's remembered next time. Set
-  `FINANCES_PREFS_FILE` to use another file, or `FINANCES_PREFS_FILE=none` to keep
-  settings for the session only. **Use `none` if you deploy the app for other
-  people**, so nobody's rules end up on a shared disk.
+  `~/.finances_app/preferences.json` so it's remembered next time, but only when
+  you open the app on the same computer it runs on. Opened from anywhere else,
+  for example once it's deployed online, settings last for the session only, so
+  nobody's rules (which contain payee names) end up on a shared disk. Use
+  **Download settings** in the Rules tab to keep them.
+- `FINANCES_PREFS_FILE` overrides this: set it to a file path to always save
+  there, or to `none` to never save.
 - `.gitignore` keeps PDFs, CSV exports and settings files out of git.
 
 ## Tests

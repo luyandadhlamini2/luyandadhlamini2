@@ -6,7 +6,10 @@ Run with:  streamlit run app.py
 from __future__ import annotations
 
 import io
+import os
 from datetime import date
+from pathlib import Path
+from urllib.parse import urlparse
 
 import pandas as pd
 import plotly.graph_objects as go
@@ -85,14 +88,30 @@ def load_statement(data: bytes, password: str):
         ) from error
 
 
+def opened_on_this_computer() -> bool:
+    return urlparse(st.context.url or "").hostname in ("localhost", "127.0.0.1", "::1")
+
+
+def prefs_path() -> Path | None:
+    """Where to keep this person's settings, or None to keep them for this session only.
+
+    Settings contain payee names. When the app is opened from another device
+    (for example once it's deployed for others) they are never written to the
+    server's disk, unless FINANCES_PREFS_FILE says where to put them.
+    """
+    if os.environ.get("FINANCES_PREFS_FILE") or opened_on_this_computer():
+        return storage.preferences_path()
+    return None
+
+
 def prefs() -> Preferences:
     if "prefs" not in st.session_state:
-        st.session_state.prefs = storage.load(storage.preferences_path())
+        st.session_state.prefs = storage.load(prefs_path())
     return st.session_state.prefs
 
 
 def save_prefs(message: str) -> None:
-    storage.save(prefs(), storage.preferences_path())
+    storage.save(prefs(), prefs_path())
     # New widget keys so editors don't re-apply their old edits to the new data
     st.session_state.version = st.session_state.get("version", 0) + 1
     st.session_state.toast = message
@@ -550,7 +569,7 @@ def rules_tab() -> None:
         save_prefs("Groups saved.")
 
     st.subheader("Back up or move your settings")
-    path = storage.preferences_path()
+    path = prefs_path()
     st.caption(f"Saved automatically to `{path}`." if path else
                "Settings last for this session only. Download them to keep them.")
     left, right = st.columns(2)
